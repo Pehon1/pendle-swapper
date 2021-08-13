@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The purpose of this contract is to simply the process of converting USDC to Pendle.Finance's 
+The purpose of this contract is to simplify the process of converting USDC to Pendle.Finance's OT-YTs
 
 ## Disclaimer
 
