@@ -69,12 +69,7 @@ contract PendleZapper is Ownable {
 
         // calculate the commission and the amount to convert
         uint256 commissionFromAmount = commissionAmount(convertAmountToBigNumber(amount, usdc));
-        uint256 amountToConvert = convertAmountToBigNumber(amount, usdc).sub(commissionFromAmount);
-
-        require(
-            convertAmountToBigNumber(amount, usdc).sub(commissionFromAmount.add(amountToConvert)) == 0,
-            "Commission calculation failed."
-        );
+        uint256 amountToConvert = convertAmountToBigNumber(amount, usdc).sub(commissionFromAmount, "Calculation error, comms took everything");
 
         // transfer commission to owner
         usdc.transfer(owner(), commissionFromAmount);

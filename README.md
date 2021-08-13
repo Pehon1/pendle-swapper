@@ -10,7 +10,7 @@ The project is unaudited, and very much in beta. No warranties. Use at your own 
 
 ## Deployment
 
-Beta contract has deployed on [Kovan Testnet](https://kovan.etherscan.io/address/0x9eC7660E23e7E691390c370A7E5510a992CEbEbE).
+Beta contract has deployed on [Kovan Testnet](https://kovan.etherscan.io/address/0xb101a17cb148290d45a05185ee43dc4f1363f434).
 
 ## Roadmap
 
