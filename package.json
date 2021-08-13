@@ -1,7 +1,7 @@
 {
-  "name": "pendlezapper",
+  "name": "pendleswapper",
   "version": "1.0.0",
-  "description": "",
+  "description": "The purpose of this contract is to faciliate Pendle.finance's multi-step conversion of USDC to OT+YT into a simple contract call. ",
   "main": "truffle-config.js",
   "directories": {
     "test": "test"
