@@ -14,8 +14,8 @@ Beta contract has deployed on [Kovan Testnet](https://kovan.etherscan.io/address
 
 ## Roadmap
 
-[x] Deployment to testnet 
-[ ] Web3 front end
-[ ] Deployment to mainnet
-[ ] USDC to OT and YT Farms
-[ ] USDC to (OT and YT) to (OT and USDC) to (OT and OT)
+- [x] Deployment to testnet 
+- [ ] Web3 front end
+- [ ] Deployment to mainnet
+- [ ] USDC to OT and YT Farms
+- [ ] USDC to (OT and YT) to (OT and USDC) to (OT and OT)
