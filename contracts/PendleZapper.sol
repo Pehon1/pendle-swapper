@@ -51,7 +51,15 @@ contract PendleZapper is Ownable {
         return amount.mul(10 ** token.decimals());
     }
 
-    function usdcToPendleOTYT(uint256 amount) external {
+    /**
+    * Converts USDC to Pendle OT YT 
+    * Before this method is called, approval must be given to this contract to spend
+    * the monies. 
+    * Expiry dates can be found on Pendle's repository, linked here
+    * https://github.com/pendle-finance/pendle-core/blob/38e040b93113a5a8d3814ec814e4188627d92b9a/deployments/
+    * For quick reference, on Kovan testnet, a possible expiry date is 1672272000
+    */ 
+    function usdcToPendleOTYT(uint256 amount, uint256 expiry) external {
 
         // get aave lending pool address
         ILendingPool lendingPool = ILendingPool(addressesProvider.getLendingPool() );
@@ -82,7 +90,7 @@ contract PendleZapper is Ownable {
 
         bytes32 forgeId  = "AaveV2";
         // tokenise the yield and send to the msg sender. Converts aUSDC to YT OT here
-        pendleRouter.tokenizeYield(forgeId, address(usdc), 1672272000, amountToConvert, msg.sender);
+        pendleRouter.tokenizeYield(forgeId, address(usdc), expiry, amountToConvert, msg.sender);
 
         emit Swapped(msg.sender, amount);
     }
