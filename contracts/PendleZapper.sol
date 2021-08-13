@@ -12,26 +12,42 @@ contract PendleZapper is Ownable {
 
     using SafeMath for uint256;
 
-    IERC20 public usdc;
-    IERC20 public ausdc;
-    IPendleRouter public pendleRouter;
+    IERC20 internal usdc;
+    IERC20 internal ausdc;
+    IPendleRouter internal pendleRouter;
 
-    ILendingPoolAddressesProvider public addressesProvider;
+    // Commission rate is in thousands. for example, 1% is 1000, 0.1% is 100
+    uint256 public commissionInThousands;
+
+    ILendingPoolAddressesProvider internal addressesProvider;
 
     event Swapped(address swapper, uint256 amount);
 
-    constructor(IERC20 _usdc, IERC20 _ausdc, ILendingPoolAddressesProvider _lendingPoolProvider, IPendleRouter _pendleRouter) {
+    constructor(IERC20 _usdc, IERC20 _ausdc, ILendingPoolAddressesProvider _lendingPoolProvider, IPendleRouter _pendleRouter, uint256 _commissionInThousands) {
         usdc = _usdc;
         ausdc = _ausdc;
         addressesProvider = _lendingPoolProvider;
         pendleRouter = _pendleRouter;
+        commissionInThousands = _commissionInThousands;
+    }
+    
+    function setCommissionRate(uint256 _commissionInThousands) external onlyOwner {
+        commissionInThousands = _commissionInThousands;
+    }
+    
+    /**
+    * Calculates the amount of commission to pay the owner of the contract, based on a input
+    * amount
+    */
+    function commissionAmount(uint256 _tokenBigAmount) public view returns (uint256) {
+        return _tokenBigAmount.mul(commissionInThousands).div(100000);
     }
 
     function getLendingPoolAddress() internal view returns (address) {
         return addressesProvider.getLendingPool();
     }
 
-    function convertAmountToBigNumber(uint256 amount, IERC20 token) internal view returns (uint256) {
+    function convertAmountToBigNumber(uint256 amount, IERC20 token) public view returns (uint256) {
         return amount.mul(10 ** token.decimals());
     }
 
@@ -43,18 +59,30 @@ contract PendleZapper is Ownable {
         // transfer from user to this contract
         usdc.transferFrom(msg.sender, address(this), convertAmountToBigNumber(amount, usdc));
 
+        // calculate the commission and the amount to convert
+        uint256 commissionFromAmount = commissionAmount(convertAmountToBigNumber(amount, usdc));
+        uint256 amountToConvert = convertAmountToBigNumber(amount, usdc).sub(commissionFromAmount);
+
+        require(
+            convertAmountToBigNumber(amount, usdc).sub(commissionFromAmount.add(amountToConvert)) == 0,
+            "Commission calculation failed."
+        );
+
+        // transfer commission to owner
+        usdc.transfer(owner(), commissionFromAmount);
+
         // approve aave to use the money in this contract
-        usdc.approve(address(lendingPool), convertAmountToBigNumber(amount, usdc));
+        usdc.approve(address(lendingPool), amountToConvert);
 
         // deposit money into aave and receive aUSDC
-        lendingPool.deposit(address(usdc), convertAmountToBigNumber(amount, usdc), address(this), 0);
+        lendingPool.deposit(address(usdc), amountToConvert, address(this), 0);
 
         // approve pendle to take the aUSDC in this contract
-        ausdc.approve(address(pendleRouter), convertAmountToBigNumber(amount, ausdc));
+        ausdc.approve(address(pendleRouter), amountToConvert);
 
         bytes32 forgeId  = "AaveV2";
         // tokenise the yield and send to the msg sender. Converts aUSDC to YT OT here
-        pendleRouter.tokenizeYield(forgeId, address(usdc), 1672272000, convertAmountToBigNumber(amount, ausdc), msg.sender);
+        pendleRouter.tokenizeYield(forgeId, address(usdc), 1672272000, amountToConvert, msg.sender);
 
         emit Swapped(msg.sender, amount);
     }
