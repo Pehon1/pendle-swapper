@@ -1,19 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./ILendingPoolAddressesProvider.sol";
 import "./ILendingPool.sol";
-import "@pendle/core/contracts/interfaces/IPendleRouter.sol";
+import "./ILendingPoolAddressesProvider.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@pendle/core/contracts/interfaces/IPendleRouter.sol";
 
 contract PendleZapper is Ownable {
 
-    IERC20 public usdc = IERC20(address(0xe22da380ee6B445bb8273C81944ADEB6E8450422));
-    IERC20 public ausdc = IERC20(address(0xe12AFeC5aa12Cf614678f9bFeeB98cA9Bb95b5B0));
-    IPendleRouter public pendleRouter = IPendleRouter(address(0x85dB6E6eDb8EC6DFeC222B80A54Cc7b42F59671e));
+    using SafeMath for uint256;
 
-    ILendingPoolAddressesProvider public addressesProvider = ILendingPoolAddressesProvider(address(0x88757f2f99175387aB4C6a4b3067c77A695b0349));
+    IERC20 public usdc;
+    IERC20 public ausdc;
+    IPendleRouter public pendleRouter;
+
+    ILendingPoolAddressesProvider public addressesProvider;
 
     event Swapped(address swapper, uint256 amount);
 
@@ -29,7 +32,7 @@ contract PendleZapper is Ownable {
     }
 
     function convertAmountToBigNumber(uint256 amount, IERC20 token) internal view returns (uint256) {
-        return amount * token.decimals();
+        return amount.mul(10 ** token.decimals());
     }
 
     function usdcToPendleOTYT(uint256 amount) external {
@@ -49,7 +52,7 @@ contract PendleZapper is Ownable {
         // approve pendle to take the aUSDC in this contract
         ausdc.approve(address(pendleRouter), convertAmountToBigNumber(amount, ausdc));
 
-        bytes32 memory forgeId  = "AaveV2";
+        bytes32 forgeId  = "AaveV2";
         // tokenise the yield and send to the msg sender. Converts aUSDC to YT OT here
         pendleRouter.tokenizeYield(forgeId, address(usdc), 1672272000, convertAmountToBigNumber(amount, ausdc), msg.sender);
 
