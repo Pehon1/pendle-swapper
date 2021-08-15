@@ -8,9 +8,9 @@ The purpose of this contract is to simplify the process of converting USDC to Pe
 
 The project is unaudited, and very much in beta. No warranties. Use at your own risk. 
 
-## Deployment
+## Gas Studies
 
-Beta contracts has deployed on 
+Beta contracts has deployed on Kovan for the following gas studies. The second variant won. 
 
 This version requires message senders to help this contract get approval from spenders to spend.
 Construction - 1,363,051 GAS
