@@ -19,6 +19,7 @@ contract PendleZapper is Ownable {
     // Commission rate is in thousands. for example, 1% is 1000, 0.1% is 100
     uint256 public commissionInThousands;
 
+    ILendingPool internal lendingPool;
     ILendingPoolAddressesProvider internal addressesProvider;
 
     event Swapped(address swapper, uint256 amount);
@@ -29,6 +30,14 @@ contract PendleZapper is Ownable {
         addressesProvider = _lendingPoolProvider;
         pendleRouter = _pendleRouter;
         commissionInThousands = _commissionInThousands;
+
+        // get aave lending pool address
+        lendingPool = ILendingPool(addressesProvider.getLendingPool() );
+
+        // approve aave to use the money in this contract
+        usdc.approve(address(lendingPool),  2**256 - 1);
+        // approve pendle to take the aUSDC in this contract
+        ausdc.approve(address(pendleRouter),  2**256 - 1);
     }
     
     function setCommissionRate(uint256 _commissionInThousands) external onlyOwner {
@@ -60,9 +69,6 @@ contract PendleZapper is Ownable {
     * For quick reference, on Kovan testnet, a possible expiry date is 1672272000
     */ 
     function usdcToPendleOTYT(uint256 amount, uint256 expiry) external {
- 
-        // get aave lending pool address
-        ILendingPool lendingPool = ILendingPool(addressesProvider.getLendingPool() );
 
         // transfer from user to this contract
         usdc.transferFrom(msg.sender, address(this), convertAmountToBigNumber(amount, usdc));
@@ -74,14 +80,8 @@ contract PendleZapper is Ownable {
         // transfer commission to owner
         usdc.transfer(owner(), commissionFromAmount);
 
-        // approve aave to use the money in this contract
-        usdc.approve(address(lendingPool), amountToConvert);
-
         // deposit money into aave and receive aUSDC
         lendingPool.deposit(address(usdc), amountToConvert, address(this), 0);
-
-        // approve pendle to take the aUSDC in this contract
-        ausdc.approve(address(pendleRouter), amountToConvert);
 
         bytes32 forgeId  = "AaveV2";
         // tokenise the yield and send to the msg sender. Converts aUSDC to YT OT here
