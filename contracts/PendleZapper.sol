@@ -29,6 +29,8 @@ contract PendleZapper is Ownable {
         ausdc = _ausdc;
         addressesProvider = _lendingPoolProvider;
         pendleRouter = _pendleRouter;
+        
+        require (_commissionInThousands <= 10000, 'Cannot set commission > 10%');
         commissionInThousands = _commissionInThousands;
 
         // get aave lending pool address
@@ -41,6 +43,7 @@ contract PendleZapper is Ownable {
     }
     
     function setCommissionRate(uint256 _commissionInThousands) external onlyOwner {
+        require (_commissionInThousands <= 10000, 'Cannot set commission > 10%');
         commissionInThousands = _commissionInThousands;
     }
     
