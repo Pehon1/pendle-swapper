@@ -4,6 +4,11 @@
         Pendle compound forge https://etherscan.io/address/0xc02aC197a4D32D93D473779Fbea2DCA1fb313eD5#code
         aave deposit contract https://etherscan.io/address/0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9#code
 
+
+Deployment arguements
+0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0x9bA00D6856a4eDF4665BcA2C2309936572473B7E,0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5,0x1b6d3E5Da9004668E14Ca39d1553E9a46Fe842B3,100
+        
+
         Kovan
         aave addresses https://docs.aave.com/developers/deployed-contracts/deployed-contracts
         aave pool address 0xE0fBa4Fc209b4948668006B2bE61711b7f465bAe

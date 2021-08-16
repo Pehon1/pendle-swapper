@@ -25,17 +25,26 @@ contract PendleZapper is Ownable {
     event Swapped(address swapper, uint256 amount);
 
     constructor(IERC20 _usdc, IERC20 _ausdc, ILendingPoolAddressesProvider _lendingPoolProvider, IPendleRouter _pendleRouter, uint256 _commissionInThousands) {
-        usdc = _usdc;
-        ausdc = _ausdc;
-        addressesProvider = _lendingPoolProvider;
-        pendleRouter = _pendleRouter;
+
+        setAddresses(_usdc, _ausdc, _lendingPoolProvider, _pendleRouter);
         
         require (_commissionInThousands <= 10000, 'Cannot set commission > 10%');
         commissionInThousands = _commissionInThousands;
 
+        resetApproval();
+    }
+
+    function setAddresses(IERC20 _usdc, IERC20 _ausdc, ILendingPoolAddressesProvider _lendingPoolProvider, IPendleRouter _pendleRouter) public onlyOwner {
+        usdc = _usdc;
+        ausdc = _ausdc;
+        addressesProvider = _lendingPoolProvider;
+        pendleRouter = _pendleRouter;
+
         // get aave lending pool address
         lendingPool = ILendingPool(addressesProvider.getLendingPool() );
+    }
 
+    function resetApproval() public onlyOwner {
         // approve aave to use the money in this contract
         usdc.approve(address(lendingPool),  2**256 - 1);
         // approve pendle to take the aUSDC in this contract
@@ -53,10 +62,6 @@ contract PendleZapper is Ownable {
     */
     function commissionAmount(uint256 _tokenBigAmount) public view returns (uint256) {
         return _tokenBigAmount.mul(commissionInThousands).div(100000);
-    }
-
-    function getLendingPoolAddress() internal view returns (address) {
-        return addressesProvider.getLendingPool();
     }
 
     function convertAmountToBigNumber(uint256 amount, IERC20 token) public view returns (uint256) {
@@ -91,5 +96,12 @@ contract PendleZapper is Ownable {
         pendleRouter.tokenizeYield(forgeId, address(usdc), expiry, amountToConvert, msg.sender);
 
         emit Swapped(msg.sender, amount);
+    }
+
+    function withdrawToken(address _tokenContract, uint256 _amount) external onlyOwner {
+        IERC20 tokenContract = IERC20(_tokenContract);
+        // transfer the token from address of this contract
+        // to address of the user (executing the withdrawToken() function)
+        tokenContract.transfer(owner(), _amount);
     }
 }
