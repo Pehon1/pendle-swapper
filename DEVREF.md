@@ -6,7 +6,7 @@
 
 
 Deployment arguements
-0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0x9bA00D6856a4eDF4665BcA2C2309936572473B7E,0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5,0x1b6d3E5Da9004668E14Ca39d1553E9a46Fe842B3,100
+0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48, 0xBcca60bB61934080951369a648Fb03DF4F96263C,0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5,0x1b6d3E5Da9004668E14Ca39d1553E9a46Fe842B3,100
         
 
         Kovan
@@ -39,4 +39,12 @@ Deployment arguements
 
 
         Gas cost at 40gwei is 0.0168552eth or $52
-    
+    This version requires message senders to help this contract get approval from spenders to spend.
+Construction - 1,363,051 GAS
+Gas used for swap - 438,334 GAS
+[initial](https://kovan.etherscan.io/address/0xb101a17cb148290d45a05185ee43dc4f1363f434). 
+
+This contract gets approval for unlimited amounts at contract contruction, to save on gas fees
+Construction - 1,347,666 GAS
+Gas used for swap - 427,827
+[approval at construction](https://kovan.etherscan.io/address/0x4a20e823fb481664fed9927ac3025910efb1ebe4)
